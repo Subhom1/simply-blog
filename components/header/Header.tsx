@@ -21,7 +21,7 @@ export default function Header() {
     }
 
     return (
-        <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
                     {/* Logo */}
@@ -35,12 +35,12 @@ export default function Header() {
                     <div className="flex items-center space-x-4">
                         {user && (
                             <>
-                                <span className="text-sm text-gray-600 hidden sm:block">
-                                    Welcome, <span className="font-semibold text-gray-900">{user.full_name || user.email}</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
+                                    Welcome, <span className="font-semibold text-gray-900 dark:text-white">{user.full_name || user.email}</span>
                                 </span>
                                 <Button
                                     onClick={handleLogout}
-                                    className="text-sm font-medium text-gray-600 hover:text-purple-600 transition-colors"
+                                    className="cursor-pointer text-sm font-medium text-red-600"
                                 >
                                     Logout
                                 </Button>

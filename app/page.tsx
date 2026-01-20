@@ -11,8 +11,8 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <HomeLayout/>
+    <div className="min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-200">
+      <HomeLayout />
     </div>
   );
 }

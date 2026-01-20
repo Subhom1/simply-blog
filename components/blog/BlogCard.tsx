@@ -11,7 +11,7 @@ interface BlogCardProps {
 
 export default function BlogCard({ id, title, description, author, createdAt, imageUrl }: BlogCardProps) {
     return (
-        <div className="group flex flex-col overflow-hidden rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+        <div className="group flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="relative aspect-[16/9] overflow-hidden">
                 <img
                     src={imageUrl}
@@ -20,22 +20,22 @@ export default function BlogCard({ id, title, description, author, createdAt, im
                 />
             </div>
             <div className="flex flex-1 flex-col p-6">
-                <div className="flex items-center text-xs text-gray-500 mb-2">
+                <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-2">
                     <span>{createdAt}</span>
                     <span className="mx-2">•</span>
                     <span>{author}</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     <Link href={`/blog/${id}`}>
                         {title}
                     </Link>
                 </h3>
-                <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-1">
+                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4 flex-1">
                     {description}
                 </p>
                 <Link
                     href={`/blog/${id}`}
-                    className="text-sm font-semibold text-purple-600 hover:text-purple-700 inline-flex items-center"
+                    className="text-sm font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 inline-flex items-center"
                 >
                     Read more
                     <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
