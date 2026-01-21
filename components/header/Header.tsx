@@ -1,5 +1,4 @@
 'use client'
-
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/utils/hooks'
@@ -36,7 +35,7 @@ export default function Header() {
                         {user && (
                             <>
                                 <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-                                    Welcome, <span className="font-semibold text-gray-900 dark:text-white">{user.full_name || user.email}</span>
+                                    Welcome, <Link href={`/profile`} className="font-semibold text-gray-900 dark:text-white">{user.full_name || user.email}</Link>
                                 </span>
                                 <Button
                                     onClick={handleLogout}

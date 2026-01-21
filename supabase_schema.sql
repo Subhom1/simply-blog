@@ -29,6 +29,7 @@ create table public.posts (
   id uuid default gen_random_uuid() primary key,
   title text not null,
   content text not null,
+  image_url text,
   author_id uuid references public.users(id) not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
@@ -42,14 +43,44 @@ create policy "Posts are viewable by everyone."
   on public.posts for select
   using ( true );
 
-create policy "Authenticated users can create posts."
-  on public.posts for insert
-  with check ( auth.role() = 'authenticated' );
+-- Enable storage
+insert into storage.buckets (id, name, public)
+values ('imgs', 'imgs', true)
+on conflict (id) do nothing;
 
+-- Storage Policies for 'imgs' bucket
+create policy "Public Access"
+  on storage.objects for select
+  using ( bucket_id = 'imgs' );
+
+create policy "Authenticated users can upload images"
+on storage.objects
+for insert
+with check (
+  bucket_id = 'imgs'
+  and auth.role() = 'authenticated'
+);
+
+create policy "Users can update their own images"
+on storage.objects
+for update
+using (
+  bucket_id = 'imgs'
+  and auth.uid() = owner
+);
+
+
+-- Refine Posts Policies
+drop policy if exists "Authenticated users can create posts." on public.posts;
+create policy "Users can create their own posts."
+  on public.posts for insert
+  with check ( auth.uid() = author_id );
+
+drop policy if exists "Users can update their own posts." on public.posts;
 create policy "Users can update their own posts."
   on public.posts for update
   using ( auth.uid() = author_id );
-
+drop policy if exists "Users can delete their own posts." on public.posts;
 create policy "Users can delete their own posts."
   on public.posts for delete
   using ( auth.uid() = author_id );
@@ -68,6 +99,7 @@ end;
 $$;
 
 -- Trigger to automatically create a public user profile on signup
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
