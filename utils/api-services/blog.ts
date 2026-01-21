@@ -26,14 +26,14 @@ export const uploadImage = async (file: File, folder: string): Promise<string> =
     return publicUrl
 }
 
-export const fetchBlogs = async (page: number = 1, pageSize: number = 6): Promise<{ blogs: BlogPost[], totalCount: number }> => {
-    console.log(`Fetching blogs (Page: ${page}, Size: ${pageSize})...`);
+export const fetchBlogs = async (page: number = 1, pageSize: number = 6, authorId?: string): Promise<{ blogs: BlogPost[], totalCount: number }> => {
+    console.log(`Fetching blogs (Page: ${page}, Size: ${pageSize}, Author: ${authorId || 'All'})...`);
 
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    // Fetch blogs with pagination
-    const { data, error, count } = await supabase
+    // Fetch blogs with pagination and optional author filter
+    let query = supabase
         .from('posts')
         .select(`
             *,
@@ -45,6 +45,12 @@ export const fetchBlogs = async (page: number = 1, pageSize: number = 6): Promis
         `, { count: 'exact' })
         .order('created_at', { ascending: false })
         .range(from, to)
+
+    if (authorId) {
+        query = query.eq('author_id', authorId)
+    }
+
+    const { data, error, count } = await query
 
     if (error) {
         console.error('Fetch Blogs Error:', error);
@@ -151,4 +157,40 @@ export const createBlogPost = async (blogData: {
 
     console.log('Create blog post success:', data);
     return data
+}
+export const updateBlogPost = async (id: string, blogData: Partial<{
+    title: string;
+    content: string;
+    image_url?: string;
+}>): Promise<BlogPost> => {
+    console.log('Update blog post request:', id, blogData);
+    const { data, error } = await supabase
+        .from('posts')
+        .update(blogData)
+        .eq('id', id)
+        .select('*, user:users(*)')
+        .single()
+
+    if (error) {
+        console.error('Update blog post error:', error);
+        throw new Error('Failed to update blog post: ' + error.message)
+    }
+
+    console.log('Update blog post success:', data);
+    return data
+}
+
+export const deleteBlogPost = async (id: string): Promise<void> => {
+    console.log('Delete blog post request:', id);
+    const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', id)
+
+    if (error) {
+        console.error('Delete blog post error:', error);
+        throw new Error('Failed to delete blog post: ' + error.message)
+    }
+
+    console.log('Delete blog post success');
 }
