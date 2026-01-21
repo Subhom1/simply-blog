@@ -6,7 +6,7 @@ import { useAppSelector } from '@/utils/hooks'
 import Input from '@/components/ui/input'
 import Button from '@/components/ui/button'
 import { authService } from '@/utils/api-services/auth'
-import { uploadImage } from '@/utils/api-services/blog'
+import { uploadImage, optimizeImage } from '@/utils/api-services/blog'
 import { setUser } from '@/utils/redux/authSlice'
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
@@ -54,7 +54,8 @@ export default function ProfilePage() {
             let avatar_url = user.avatar_url || ''
 
             if (image) {
-                avatar_url = await uploadImage(image, 'avatars')
+                const optimizedImage = await optimizeImage(image)
+                avatar_url = await uploadImage(optimizedImage, 'avatars')
             }
 
             const { user: updatedUser, error } = await authService.updateProfile(user.id, {

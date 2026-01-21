@@ -2,13 +2,30 @@
 import Header from "../header/Header";
 import BlogCard from "../blog/BlogCard";
 import Button from "../ui/button";
-import { useAppSelector } from "@/utils/hooks";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/utils/hooks";
+import { fetchBlogs } from "@/utils/api-services/blog";
+import { setBlogs, setLoading, setError } from "@/utils/redux/blogSlice";
 
 const buttonStyle = " cursor-pointer bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2.5 rounded-full font-bold hover:opacity-90 transition-all shadow-lg hover:shadow-purple-200/50 dark:hover:shadow-purple-900/40 active:scale-95"
 export default function HomeLayout() {
   const blog = useAppSelector((state) => state.blog)
   const router = useRouter()
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    const loadBlogs = async () => {
+      dispatch(setLoading(true))
+      try {
+        const data = await fetchBlogs()
+        dispatch(setBlogs(data))
+      } catch (error: any) {
+        dispatch(setError(error.message))
+      }
+    }
+    loadBlogs()
+  }, [dispatch])
   return (
     <div>
       <Header />

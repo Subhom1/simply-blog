@@ -22,11 +22,19 @@ const blogSlice = createSlice({
         addBlog: (state, action: PayloadAction<BlogPost>) => {
             state.blogs.unshift(action.payload)
         },
+        setBlogs: (state, action: PayloadAction<BlogPost[]>) => {
+            state.blogs = action.payload
+            state.loading = false
+        },
+        setLoading: (state, action: PayloadAction<boolean>) => {
+            state.loading = action.payload
+        },
         setError: (state, action: PayloadAction<string | null>) => {
             state.error = action.payload
+            state.loading = false
         },
     },
 })
 
-export const { addBlog, setError } = blogSlice.actions
+export const { addBlog, setBlogs, setLoading, setError } = blogSlice.actions
 export default blogSlice.reducer

@@ -8,7 +8,7 @@ import Button from '@/components/ui/button'
 import { addBlog } from '@/utils/redux/blogSlice'
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
-import { uploadImage, createBlogPost } from '@/utils/api-services/blog'
+import { uploadImage, createBlogPost, optimizeImage } from '@/utils/api-services/blog'
 
 const buttonStyle = "cursor-pointer bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg hover:shadow-purple-200/50 dark:hover:shadow-purple-900/40 active:scale-95 w-full flex justify-center items-center gap-2"
 const inputStyle = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all"
@@ -48,7 +48,8 @@ export default function CreateBlogPage() {
             let image_url = ''
 
             if (image) {
-                image_url = await uploadImage(image, 'blog-images')
+                const optimizedImage = await optimizeImage(image)
+                image_url = await uploadImage(optimizedImage, 'blog-images')
             }
 
             const blogPost = await createBlogPost({
