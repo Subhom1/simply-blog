@@ -6,6 +6,12 @@ interface BlogState {
     currentBlog: BlogPost | null
     loading: boolean
     error: string | null
+    pagination: {
+        currentPage: number
+        totalPages: number
+        pageSize: number
+        totalCount: number
+    }
 }
 
 const initialState: BlogState = {
@@ -13,6 +19,12 @@ const initialState: BlogState = {
     currentBlog: null,
     loading: false,
     error: null,
+    pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        pageSize: 6,
+        totalCount: 0
+    }
 }
 
 const blogSlice = createSlice({
@@ -21,10 +33,21 @@ const blogSlice = createSlice({
     reducers: {
         addBlog: (state, action: PayloadAction<BlogPost>) => {
             state.blogs.unshift(action.payload)
+            state.pagination.totalCount += 1
+            state.pagination.totalPages = Math.ceil(state.pagination.totalCount / state.pagination.pageSize)
         },
-        setBlogs: (state, action: PayloadAction<BlogPost[]>) => {
-            state.blogs = action.payload
+        setBlogs: (state, action: PayloadAction<{ blogs: BlogPost[], totalCount: number }>) => {
+            state.blogs = action.payload.blogs
+            state.pagination.totalCount = action.payload.totalCount
+            state.pagination.totalPages = Math.ceil(action.payload.totalCount / state.pagination.pageSize)
             state.loading = false
+        },
+        setCurrentBlog: (state, action: PayloadAction<BlogPost | null>) => {
+            state.currentBlog = action.payload
+            state.loading = false
+        },
+        setCurrentPage: (state, action: PayloadAction<number>) => {
+            state.pagination.currentPage = action.payload
         },
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.loading = action.payload
@@ -36,5 +59,5 @@ const blogSlice = createSlice({
     },
 })
 
-export const { addBlog, setBlogs, setLoading, setError } = blogSlice.actions
+export const { addBlog, setBlogs, setCurrentBlog, setCurrentPage, setLoading, setError } = blogSlice.actions
 export default blogSlice.reducer

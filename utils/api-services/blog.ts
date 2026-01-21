@@ -26,8 +26,40 @@ export const uploadImage = async (file: File, folder: string): Promise<string> =
     return publicUrl
 }
 
-export const fetchBlogs = async (): Promise<BlogPost[]> => {
-    console.log('Fetching blogs...');
+export const fetchBlogs = async (page: number = 1, pageSize: number = 6): Promise<{ blogs: BlogPost[], totalCount: number }> => {
+    console.log(`Fetching blogs (Page: ${page}, Size: ${pageSize})...`);
+
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    // Fetch blogs with pagination
+    const { data, error, count } = await supabase
+        .from('posts')
+        .select(`
+            *,
+            user:users (
+                id,
+                full_name,
+                avatar_url
+            )
+        `, { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to)
+
+    if (error) {
+        console.error('Fetch Blogs Error:', error);
+        throw new Error('Failed to fetch blogs: ' + error.message)
+    }
+
+    console.log('Fetch Blogs Success:', data.length, 'blogs found, total:', count);
+    return {
+        blogs: data as BlogPost[],
+        totalCount: count || 0
+    }
+}
+
+export const fetchBlogById = async (id: string): Promise<BlogPost> => {
+    console.log(`Fetching blog with ID: ${id}...`);
     const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -38,15 +70,15 @@ export const fetchBlogs = async (): Promise<BlogPost[]> => {
                 avatar_url
             )
         `)
-        .order('created_at', { ascending: false })
+        .eq('id', id)
+        .single()
 
     if (error) {
-        console.error('Fetch Blogs Error:', error);
-        throw new Error('Failed to fetch blogs: ' + error.message)
+        console.error('Fetch Blog Error:', error);
+        throw new Error('Failed to fetch blog: ' + error.message)
     }
 
-    console.log('Fetch Blogs Success:', data.length, 'blogs found');
-    return data as BlogPost[]
+    return data as BlogPost
 }
 
 export const optimizeImage = async (file: File): Promise<File> => {
