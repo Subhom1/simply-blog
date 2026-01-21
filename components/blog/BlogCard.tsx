@@ -25,7 +25,7 @@ export default function BlogCard({ id, title, description, author, createdAt, im
                     <span className="mx-2">•</span>
                     <span>{author}</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                     <Link href={`/blog/${id}`}>
                         {title}
                     </Link>

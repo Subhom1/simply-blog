@@ -3,16 +3,21 @@
 import { useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/utils/hooks'
-import { fetchBlogById } from '@/utils/api-services/blog'
-import { setCurrentBlog, setLoading, setError } from '@/utils/redux/blogSlice'
+import { fetchBlogById, deleteBlogPost } from '@/utils/api-services/blog'
+import { setCurrentBlog, setLoading, setError, deleteBlog } from '@/utils/redux/blogSlice'
 import Header from '@/components/header/Header'
 import Button from '@/components/ui/button'
+import { useState } from 'react'
 
 export default function BlogViewPage() {
     const { id } = useParams()
     const router = useRouter()
     const dispatch = useAppDispatch()
     const { currentBlog, loading, error } = useAppSelector((state) => state.blog)
+    const { user } = useAppSelector((state) => state.auth)
+    const [isDeleting, setIsDeleting] = useState(false)
+
+    const isAuthor = user && currentBlog && user.id === currentBlog.author_id
 
     useEffect(() => {
         if (!id) return
@@ -34,6 +39,21 @@ export default function BlogViewPage() {
             dispatch(setCurrentBlog(null))
         }
     }, [id, dispatch])
+
+    const handleDelete = async () => {
+        if (!id || !window.confirm('Are you sure you want to delete this story? This action cannot be undone.')) return
+
+        setIsDeleting(true)
+        try {
+            await deleteBlogPost(id as string)
+            dispatch(deleteBlog(id as string))
+            router.replace('/')
+        } catch (err: any) {
+            alert('Failed to delete story: ' + err.message)
+        } finally {
+            setIsDeleting(false)
+        }
+    }
 
     if (loading) {
         return (
@@ -114,7 +134,7 @@ export default function BlogViewPage() {
                         </p>
                     </div>
 
-                    <div className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                    <div className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-wrap justify-between items-center gap-4">
                         <Button
                             onClick={() => router.push('/')}
                             className="text-purple-600 dark:text-purple-400 font-bold flex items-center gap-2 hover:translate-x-[-4px] transition-transform"
@@ -124,6 +144,24 @@ export default function BlogViewPage() {
                             </svg>
                             Back to Stories
                         </Button>
+
+                        {isAuthor && (
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    onClick={() => router.push(`/blog/${id}/edit`)}
+                                    className="px-6 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                >
+                                    Edit Story
+                                </Button>
+                                <Button
+                                    onClick={handleDelete}
+                                    disabled={isDeleting}
+                                    className="px-6 py-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors disabled:opacity-50"
+                                >
+                                    {isDeleting ? 'Deleting...' : 'Delete Story'}
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </article>

@@ -12,6 +12,7 @@ interface BlogState {
         pageSize: number
         totalCount: number
     }
+    viewFilter: 'all' | 'my-posts'
 }
 
 const initialState: BlogState = {
@@ -24,7 +25,8 @@ const initialState: BlogState = {
         totalPages: 0,
         pageSize: 6,
         totalCount: 0
-    }
+    },
+    viewFilter: 'all'
 }
 
 const blogSlice = createSlice({
@@ -35,6 +37,23 @@ const blogSlice = createSlice({
             state.blogs.unshift(action.payload)
             state.pagination.totalCount += 1
             state.pagination.totalPages = Math.ceil(state.pagination.totalCount / state.pagination.pageSize)
+        },
+        updateBlog: (state, action: PayloadAction<BlogPost>) => {
+            const index = state.blogs.findIndex(b => b.id === action.payload.id)
+            if (index !== -1) {
+                state.blogs[index] = action.payload
+            }
+            if (state.currentBlog?.id === action.payload.id) {
+                state.currentBlog = action.payload
+            }
+        },
+        deleteBlog: (state, action: PayloadAction<string>) => {
+            state.blogs = state.blogs.filter(b => b.id !== action.payload)
+            state.pagination.totalCount -= 1
+            state.pagination.totalPages = Math.ceil(state.pagination.totalCount / state.pagination.pageSize)
+            if (state.currentBlog?.id === action.payload) {
+                state.currentBlog = null
+            }
         },
         setBlogs: (state, action: PayloadAction<{ blogs: BlogPost[], totalCount: number }>) => {
             state.blogs = action.payload.blogs
@@ -56,8 +75,12 @@ const blogSlice = createSlice({
             state.error = action.payload
             state.loading = false
         },
+        setViewFilter: (state, action: PayloadAction<'all' | 'my-posts'>) => {
+            state.viewFilter = action.payload
+            state.pagination.currentPage = 1
+        },
     },
 })
 
-export const { addBlog, setBlogs, setCurrentBlog, setCurrentPage, setLoading, setError } = blogSlice.actions
+export const { addBlog, updateBlog, deleteBlog, setBlogs, setCurrentBlog, setCurrentPage, setLoading, setError, setViewFilter } = blogSlice.actions
 export default blogSlice.reducer
