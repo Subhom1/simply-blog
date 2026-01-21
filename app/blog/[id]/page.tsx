@@ -8,6 +8,7 @@ import { setCurrentBlog, setLoading, setError, deleteBlog } from '@/utils/redux/
 import Header from '@/components/header/Header'
 import Button from '@/components/ui/button'
 import { useState } from 'react'
+import CommentSection from '@/components/blog/CommentSection'
 
 export default function BlogViewPage() {
     const { id } = useParams()
@@ -83,7 +84,38 @@ export default function BlogViewPage() {
         <div className="min-h-screen bg-white dark:bg-black transition-colors duration-200">
             <Header />
 
-            <article>
+            {/* Top Navigation & Controls */}
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex flex-wrap justify-between items-center gap-4">
+                <Button
+                    onClick={() => router.push('/')}
+                    className="group text-gray-600 dark:text-gray-400 font-bold flex items-center gap-2 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                >
+                    <svg className="w-5 h-5 transition-transform group-hover:translate-x-[-4px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Stories
+                </Button>
+
+                {isAuthor && (
+                    <div className="flex items-center gap-3">
+                        <Button
+                            onClick={() => router.push(`/blog/${id}/edit`)}
+                            className="px-6 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        >
+                            Edit Story
+                        </Button>
+                        <Button
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            className="px-6 py-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors disabled:opacity-50"
+                        >
+                            {isDeleting ? 'Deleting...' : 'Delete Story'}
+                        </Button>
+                    </div>
+                )}
+            </div>
+
+            <article className="mt-8">
                 {/* Hero Section */}
                 <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
                     <img
@@ -134,35 +166,7 @@ export default function BlogViewPage() {
                         </p>
                     </div>
 
-                    <div className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-wrap justify-between items-center gap-4">
-                        <Button
-                            onClick={() => router.push('/')}
-                            className="text-purple-600 dark:text-purple-400 font-bold flex items-center gap-2 hover:translate-x-[-4px] transition-transform"
-                        >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Back to Stories
-                        </Button>
-
-                        {isAuthor && (
-                            <div className="flex items-center gap-3">
-                                <Button
-                                    onClick={() => router.push(`/blog/${id}/edit`)}
-                                    className="px-6 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                                >
-                                    Edit Story
-                                </Button>
-                                <Button
-                                    onClick={handleDelete}
-                                    disabled={isDeleting}
-                                    className="px-6 py-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors disabled:opacity-50"
-                                >
-                                    {isDeleting ? 'Deleting...' : 'Delete Story'}
-                                </Button>
-                            </div>
-                        )}
-                    </div>
+                    <CommentSection />
                 </div>
             </article>
         </div>
