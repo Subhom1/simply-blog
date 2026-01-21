@@ -2,6 +2,8 @@
 
 A premium, full-stack blog platform built with **Next.js 16**, **Supabase**, and **Redux Toolkit**. SimplyBlog combines a stunning, modern aesthetic with robust features for creators and readers.
 
+<img src="https://raw.githubusercontent.com/Subhom1/mygitsrc/refs/heads/master/src/Simplyblog.png" alt="poster"/>
+
 
 ## Features
 
