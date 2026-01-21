@@ -68,6 +68,44 @@ export const authService = {
         return { error: error ? error.message : null }
     },
 
+    async updateProfile(userId: string, updateData: { full_name?: string; avatar_url?: string }): Promise<{ user: User | null; error: string | null }> {
+        console.log('UpdateProfile Request:', { userId, updateData });
+
+        // Update public.users table
+        const { data, error: updateError } = await supabase
+            .from('users')
+            .update(updateData)
+            .eq('id', userId)
+            .select()
+            .single()
+
+        if (updateError) {
+            console.error('UpdateProfile DB Error:', updateError);
+            return { user: null, error: updateError.message }
+        }
+
+        // Update auth metadata
+        const { error: authError } = await supabase.auth.updateUser({
+            data: updateData
+        })
+
+        if (authError) {
+            console.error('UpdateProfile Auth Error:', authError);
+            return { user: null, error: authError.message }
+        }
+
+        console.log('UpdateProfile Success:', data);
+        return {
+            user: {
+                id: data.id,
+                email: data.email,
+                full_name: data.full_name,
+                avatar_url: data.avatar_url
+            },
+            error: null
+        }
+    },
+
     async getCurrentUser(): Promise<User | null> {
         const { data: { user }, error } = await supabase.auth.getUser()
 

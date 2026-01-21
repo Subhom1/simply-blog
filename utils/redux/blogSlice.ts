@@ -19,11 +19,14 @@ const blogSlice = createSlice({
     name: 'blog',
     initialState,
     reducers: {
+        addBlog: (state, action: PayloadAction<BlogPost>) => {
+            state.blogs.unshift(action.payload)
+        },
         setError: (state, action: PayloadAction<string | null>) => {
             state.error = action.payload
         },
     },
 })
 
-export const { setError } = blogSlice.actions
+export const { addBlog, setError } = blogSlice.actions
 export default blogSlice.reducer
