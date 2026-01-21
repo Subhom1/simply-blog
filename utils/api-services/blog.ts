@@ -1,7 +1,8 @@
 import { createClient } from '../supabase/client'
-import { BlogPost } from '@/types'
+import { BlogPost, User, BlogComment } from '@/types'
 
 const supabase = createClient()
+
 
 export const uploadImage = async (file: File, folder: string): Promise<string> => {
     console.log(`Uploading to ${folder}...`);
@@ -193,4 +194,65 @@ export const deleteBlogPost = async (id: string): Promise<void> => {
     }
 
     console.log('Delete blog post success');
+}
+
+export const fetchBlogCommentsByPostId = async (postId: string): Promise<BlogComment[]> => {
+    console.log(`Fetching comments for post: ${postId}...`);
+    const { data, error } = await supabase
+        .from('comments')
+        .select(`
+            *,
+            user:users (
+                id,
+                full_name,
+                avatar_url
+            )
+        `)
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true })
+
+    if (error) {
+        console.error('Fetch comments error:', error);
+        throw new Error('Failed to fetch comments: ' + error.message)
+    }
+
+    return data as (BlogComment & { user: User })[]
+}
+
+export const addBlogComment = async (postId: string, authorId: string, content: string): Promise<BlogComment> => {
+    console.log('Adding comment:', { postId, authorId, content });
+    const { data, error } = await supabase
+        .from('comments')
+        .insert([{ post_id: postId, author_id: authorId, content }])
+        .select(`
+            *,
+            user:users (
+                id,
+                full_name,
+                avatar_url
+            )
+        `)
+        .single()
+
+    if (error) {
+        console.error('Add comment error:', error);
+        throw new Error('Failed to add comment: ' + error.message)
+    }
+
+    return data as (BlogComment & { user: User })
+}
+
+export const deleteBlogComment = async (id: string): Promise<void> => {
+    console.log('Delete comment request:', id);
+    const { error } = await supabase
+        .from('comments')
+        .delete()
+        .eq('id', id)
+
+    if (error) {
+        console.error('Delete comment error:', error);
+        throw new Error('Failed to delete comment: ' + error.message)
+    }
+
+    console.log('Delete comment success');
 }

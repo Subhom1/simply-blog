@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { BlogPost } from '@/types'
+import { BlogPost, BlogComment } from '@/types'
 
 interface BlogState {
     blogs: BlogPost[]
@@ -13,6 +13,7 @@ interface BlogState {
         totalCount: number
     }
     viewFilter: 'all' | 'my-posts'
+    comments: BlogComment[]
 }
 
 const initialState: BlogState = {
@@ -26,7 +27,8 @@ const initialState: BlogState = {
         pageSize: 6,
         totalCount: 0
     },
-    viewFilter: 'all'
+    viewFilter: 'all',
+    comments: []
 }
 
 const blogSlice = createSlice({
@@ -79,8 +81,17 @@ const blogSlice = createSlice({
             state.viewFilter = action.payload
             state.pagination.currentPage = 1
         },
+        setBlogComments: (state, action: PayloadAction<BlogComment[]>) => {
+            state.comments = action.payload
+        },
+        addBlogCommentToState: (state, action: PayloadAction<BlogComment>) => {
+            state.comments.push(action.payload)
+        },
+        deleteBlogCommentFromState: (state, action: PayloadAction<string>) => {
+            state.comments = state.comments.filter(c => c.id !== action.payload)
+        },
     },
 })
 
-export const { addBlog, updateBlog, deleteBlog, setBlogs, setCurrentBlog, setCurrentPage, setLoading, setError, setViewFilter } = blogSlice.actions
+export const { addBlog, updateBlog, deleteBlog, setBlogs, setCurrentBlog, setCurrentPage, setLoading, setError, setViewFilter, setBlogComments, addBlogCommentToState, deleteBlogCommentFromState } = blogSlice.actions
 export default blogSlice.reducer
