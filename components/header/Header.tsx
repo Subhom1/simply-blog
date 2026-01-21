@@ -34,15 +34,30 @@ export default function Header() {
                     <div className="flex items-center space-x-4">
                         {user && (
                             <>
-                                <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-                                    Welcome, <Link href={`/profile`} className="font-semibold text-gray-900 dark:text-white">{user.full_name || user.email}</Link>
-                                </span>
-                                <Button
-                                    onClick={handleLogout}
-                                    className="cursor-pointer text-sm font-medium text-red-600"
-                                >
-                                    Logout
-                                </Button>
+                                <div className="flex items-center space-x-3">
+                                    <Link href="/profile" className="flex items-center group">
+                                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-800 transition-all group-hover:border-purple-400">
+                                            {user.avatar_url ? (
+                                                <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400 hidden sm:block group-hover:text-purple-600 transition-colors">
+                                            {user.full_name || user.email}
+                                        </span>
+                                    </Link>
+                                    <Button
+                                        onClick={handleLogout}
+                                        className="cursor-pointer text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
+                                    >
+                                        Logout
+                                    </Button>
+                                </div>
                             </>
                         )}
                     </div>
